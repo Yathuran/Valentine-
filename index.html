@@ -325,12 +325,12 @@
             <h2>🎉 You Made The BEST Decision <span class="royal-name">Keerthy</span>! 🎉</h2>
             <div class="celebration">🎊 💖 ✨</div>
             
-            <div class="photo-frame">
-                <img src="IMG-20251118-WA0047.jpg" alt="My Beautiful Valentine" />
-            </div>
-            
             <div class="love-counter">
                 I love you <span id="counter">0</span>% 💕
+            </div>
+            
+            <div class="photo-frame">
+                <img src="IMG-20251118-WA0047.jpg" alt="My Beautiful Valentine" />
             </div>
 
             <div class="message">✨ <span class="royal-name">Keerthy</span>, you make my heart skip a beat!</div>
@@ -344,91 +344,83 @@
         <source src="Entha Pennilum Illatha Ondru.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Tension Music - You can replace this URL with any suspense/tension music -->
-    <audio id="tensionMusic" loop autoplay>
-        <!-- Option 1: Use a free tension music URL (replace with your choice) -->
-        <!-- <source src="YOUR_TENSION_MUSIC.mp3" type="audio/mpeg"> -->
-    </audio>
-
     <script>
         const yesBtn = document.getElementById('yesBtn');
         const noBtn = document.getElementById('noBtn');
         const popup = document.getElementById('popup');
         const container = document.querySelector('.container');
         const loveMusic = document.getElementById('loveMusic');
-        const tensionMusic = document.getElementById('tensionMusic');
         
         let noScale = 1;
         let tensionAudioContext;
-        let tensionOscillators = [];
+        let tensionOscillator;
         let tensionGainNode;
+        let tensionStarted = false;
 
-        // Create tension/suspense music using Web Audio API
+        // Create simple tension music
         function createTensionMusic() {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            tensionAudioContext = new AudioContext();
-            tensionGainNode = tensionAudioContext.createGain();
-            tensionGainNode.gain.value = 0.15; // Low volume for background
-            tensionGainNode.connect(tensionAudioContext.destination);
-
-            // Create a tense, suspenseful chord progression
-            const frequencies = [
-                [220, 277, 330], // Am chord
-                [196, 247, 294], // G chord
-                [208, 262, 311], // Ab chord
-            ];
-
-            let chordIndex = 0;
-
-            function playChord() {
-                // Stop previous oscillators
-                tensionOscillators.forEach(osc => {
-                    try { osc.stop(); } catch(e) {}
-                });
-                tensionOscillators = [];
-
-                // Create new chord
-                const currentFreqs = frequencies[chordIndex];
-                currentFreqs.forEach(freq => {
-                    const osc = tensionAudioContext.createOscillator();
-                    osc.type = 'sine';
-                    osc.frequency.value = freq;
-                    osc.connect(tensionGainNode);
-                    osc.start();
-                    tensionOscillators.push(osc);
-                });
-
-                chordIndex = (chordIndex + 1) % frequencies.length;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                tensionAudioContext = new AudioContext();
+                
+                // Create oscillator for tension sound
+                tensionOscillator = tensionAudioContext.createOscillator();
+                tensionGainNode = tensionAudioContext.createGain();
+                
+                // Low frequency for suspense
+                tensionOscillator.type = 'sine';
+                tensionOscillator.frequency.value = 110; // Low A note
+                
+                // Start very quiet
+                tensionGainNode.gain.value = 0.1;
+                
+                tensionOscillator.connect(tensionGainNode);
+                tensionGainNode.connect(tensionAudioContext.destination);
+                
+                tensionOscillator.start();
+                console.log("Tension music started!");
+                
+                // Add pulsing effect
+                setInterval(() => {
+                    if (tensionGainNode && !popup.style.display.includes('flex')) {
+                        const currentGain = tensionGainNode.gain.value;
+                        tensionGainNode.gain.setValueAtTime(currentGain, tensionAudioContext.currentTime);
+                        tensionGainNode.gain.linearRampToValueAtTime(currentGain * 0.7, tensionAudioContext.currentTime + 0.5);
+                        tensionGainNode.gain.linearRampToValueAtTime(currentGain, tensionAudioContext.currentTime + 1);
+                    }
+                }, 1000);
+                
+            } catch(e) {
+                console.log("Tension music error:", e);
             }
-
-            // Play chord progression every 2 seconds
-            playChord();
-            return setInterval(playChord, 2000);
         }
 
         // Stop tension music
         function stopTensionMusic() {
-            tensionOscillators.forEach(osc => {
-                try { osc.stop(); } catch(e) {}
-            });
-            tensionOscillators = [];
-            if (tensionAudioContext) {
-                tensionAudioContext.close();
+            try {
+                if (tensionOscillator) {
+                    tensionOscillator.stop();
+                    tensionOscillator = null;
+                }
+                if (tensionAudioContext) {
+                    tensionAudioContext.close();
+                    tensionAudioContext = null;
+                }
+                console.log("Tension music stopped!");
+            } catch(e) {
+                console.log("Error stopping tension:", e);
             }
         }
 
-        // Start tension music on first interaction
-        let tensionInterval;
-        let tensionStarted = false;
+        // Start tension on first click
         function startTension() {
             if (!tensionStarted) {
                 tensionStarted = true;
-                tensionInterval = createTensionMusic();
+                createTensionMusic();
             }
         }
 
-        // Listen for first interaction to start tension music
-        document.addEventListener('mousemove', startTension, { once: true });
+        // Start on first mouse move or click
         document.addEventListener('click', startTension, { once: true });
         document.addEventListener('touchstart', startTension, { once: true });
 
@@ -443,9 +435,11 @@
             noBtn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${noScale})`;
             noBtn.style.position = 'absolute';
             
-            // Increase tension music volume slightly each time
-            if (tensionGainNode) {
-                tensionGainNode.gain.value = Math.min(0.3, tensionGainNode.gain.value + 0.02);
+            // Increase tension music volume each time No is avoided
+            if (tensionGainNode && tensionAudioContext) {
+                const newVolume = Math.min(0.25, tensionGainNode.gain.value + 0.03);
+                tensionGainNode.gain.value = newVolume;
+                console.log("Tension increased to:", newVolume);
             }
         }
 
@@ -486,7 +480,6 @@
             
             // Stop tension music
             stopTensionMusic();
-            if (tensionInterval) clearInterval(tensionInterval);
             
             popup.style.display = 'flex';
             
