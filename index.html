@@ -354,6 +354,22 @@
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioContext = new AudioContext();
 
+        // Enable audio context on first user interaction
+        let audioEnabled = false;
+        function enableAudio() {
+            if (!audioEnabled && audioContext.state === 'suspended') {
+                audioContext.resume().then(() => {
+                    audioEnabled = true;
+                    console.log('Audio enabled!');
+                });
+            }
+        }
+
+        // Listen for any user interaction to enable audio
+        document.addEventListener('click', enableAudio, { once: true });
+        document.addEventListener('touchstart', enableAudio, { once: true });
+        document.addEventListener('mousemove', enableAudio, { once: true });
+
         // Function to play "whoosh" sound when No button dodges
         function playDodgeSound() {
             const oscillator = audioContext.createOscillator();
@@ -437,11 +453,6 @@
         // YES button clicked!
         yesBtn.addEventListener('click', () => {
             popup.style.display = 'flex';
-            
-            // Resume audio context (needed for some browsers)
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
             
             // Play music with error handling
             loveMusic.play().then(() => {
@@ -533,6 +544,9 @@
                 popup.style.display = 'none';
                 loveMusic.pause();
                 loveMusic.currentTime = 0;
+                
+                // Remove any remaining confetti and hearts
+                document.querySelectorAll('.confetti, .floating-heart, .firework').forEach(el => el.remove());
             }
         });
 
