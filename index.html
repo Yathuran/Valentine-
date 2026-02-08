@@ -22,6 +22,7 @@
             position: relative;
         }
 
+        /* Animated background hearts */
         .bg-heart {
             position: fixed;
             font-size: 30px;
@@ -81,6 +82,7 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
+        /* Typing animation */
         .typing-text {
             overflow: hidden;
             border-right: 3px solid #ff4757;
@@ -309,12 +311,14 @@
     </style>
 </head>
 <body>
+    <!-- Background hearts -->
     <div class="bg-heart" style="top: 10%; left: 10%;">💕</div>
     <div class="bg-heart" style="top: 20%; right: 15%; animation-delay: 2s;">💖</div>
     <div class="bg-heart" style="bottom: 15%; left: 20%; animation-delay: 4s;">💗</div>
     <div class="bg-heart" style="bottom: 25%; right: 10%; animation-delay: 6s;">💝</div>
 
     <div class="container">
+        <!-- Sparkles -->
         <div class="sparkle" style="top: 10%; left: 10%;"></div>
         <div class="sparkle" style="top: 15%; right: 15%; animation-delay: 0.5s;"></div>
         <div class="sparkle" style="bottom: 20%; left: 20%; animation-delay: 1s;"></div>
@@ -335,7 +339,7 @@
             <div class="celebration">🎊 💖 ✨</div>
             
             <div class="photo-frame">
-                <div style="width: 100%; height: 300px; background: linear-gradient(135deg, #ffeef8, #ffe0f0); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 3em;">📸</div>
+                <img id="valentinePhoto" src="IMG-20251118-WA0047.jpg" alt="My Beautiful Valentine" />
             </div>
             
             <div class="love-counter">
@@ -351,26 +355,35 @@
         </div>
     </div>
 
+    <audio id="loveMusic" loop>
+        <source src="Entha Pennilum Illatha Ondru.MP3" type="audio/mpeg">
+    </audio>
+
     <script>
         const yesBtn = document.getElementById('yesBtn');
         const noBtn = document.getElementById('noBtn');
         const popup = document.getElementById('popup');
         const container = document.querySelector('.container');
+        const loveMusic = document.getElementById('loveMusic');
         
         let noClickCount = 0;
         let yesScale = 1;
         let noScale = 1;
 
+        // Move No button and adjust sizes
         function moveNoButton() {
             noClickCount++;
             
+            // Make Yes button BIGGER
             yesScale += 0.1;
             yesBtn.style.transform = `scale(${yesScale})`;
             
+            // Make No button SMALLER
             noScale = Math.max(0.3, noScale - 0.1);
             noBtn.style.fontSize = `${1 * noScale}em`;
             noBtn.style.padding = `${15 * noScale}px ${40 * noScale}px`;
             
+            // Move to random position
             const containerRect = container.getBoundingClientRect();
             const maxX = containerRect.width - noBtn.offsetWidth - 80;
             const maxY = 100;
@@ -380,11 +393,13 @@
             
             noBtn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${noScale})`;
             
+            // After 5 tries, make No button nearly invisible
             if (noClickCount >= 5) {
                 noBtn.style.opacity = '0.3';
             }
         }
 
+        // Desktop hover
         document.addEventListener('mousemove', (e) => {
             const noRect = noBtn.getBoundingClientRect();
             const noCenterX = noRect.left + noRect.width / 2;
@@ -400,6 +415,7 @@
             }
         });
 
+        // Mobile tap
         noBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
             moveNoButton();
@@ -410,14 +426,23 @@
             moveNoButton();
         });
 
+        // YES button clicked!
         yesBtn.addEventListener('click', () => {
             popup.style.display = 'flex';
+            
+            // Play music
+            loveMusic.play().catch(err => console.log("Music autoplay prevented:", err));
+            
+            // Start love counter
             animateLoveCounter();
+            
+            // Create effects
             createFireworks();
             createConfetti();
             createFloatingHearts();
         });
 
+        // Animate love counter to 100%
         function animateLoveCounter() {
             const counter = document.getElementById('counter');
             let count = 0;
@@ -426,11 +451,12 @@
                 counter.textContent = count;
                 if (count >= 100) {
                     clearInterval(interval);
-                    counter.textContent = '∞';
+                    counter.textContent = '∞'; // Infinity symbol
                 }
             }, 30);
         }
 
+        // Fireworks effect
         function createFireworks() {
             const colors = ['#ff4757', '#ff6b81', '#ffa502', '#ff6348', '#fd79a8', '#fdcb6e'];
             for (let i = 0; i < 10; i++) {
@@ -449,6 +475,7 @@
             }
         }
 
+        // Confetti
         function createConfetti() {
             const colors = ['#ff4757', '#ff6b81', '#ffa502', '#ff6348', '#fd79a8', '#fdcb6e'];
             for (let i = 0; i < 150; i++) {
@@ -467,6 +494,7 @@
             }
         }
 
+        // Floating hearts
         function createFloatingHearts() {
             const hearts = ['💕', '💖', '💗', '💝', '💘', '❤️', '💓', '💞'];
             for (let i = 0; i < 30; i++) {
@@ -484,9 +512,12 @@
             }
         }
 
+        // Close popup
         popup.addEventListener('click', (e) => {
             if (e.target === popup) {
                 popup.style.display = 'none';
+                loveMusic.pause();
+                loveMusic.currentTime = 0;
             }
         });
     </script>
