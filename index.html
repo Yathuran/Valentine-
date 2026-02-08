@@ -349,50 +349,54 @@
         
         let noClickCount = 0;
         let noScale = 1;
+        let isPopupOpen = false;
+        let audioContextInitialized = false;
 
-        // Create Audio Context for dodge sound effect
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioContext = new AudioContext();
-
-        // Enable audio context on first user interaction
-        let audioEnabled = false;
-        function enableAudio() {
-            if (!audioEnabled && audioContext.state === 'suspended') {
-                audioContext.resume().then(() => {
-                    audioEnabled = true;
-                    console.log('Audio enabled!');
-                });
+        // Initialize Web Audio API on first user gesture
+        let audioContext;
+        function initAudio() {
+            if (!audioContextInitialized) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioContext = new AudioContext();
+                audioContextInitialized = true;
             }
         }
 
-        // Listen for any user interaction to enable audio
-        document.addEventListener('click', enableAudio, { once: true });
-        document.addEventListener('touchstart', enableAudio, { once: true });
-        document.addEventListener('mousemove', enableAudio, { once: true });
-
         // Function to play "whoosh" sound when No button dodges
         function playDodgeSound() {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
+            if (!audioContextInitialized) return;
             
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            // Create a "whoosh" sound effect
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-            oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
-            
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.1);
+            try {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } catch (e) {
+                console.log("Sound play failed:", e);
+            }
         }
 
         // Function to move the "No" button
         function moveNoButton() {
+            if (isPopupOpen) return; // Don't move if popup is open
+            
             noClickCount++;
+            
+            // Initialize audio on first dodge attempt
+            if (!audioContextInitialized) {
+                initAudio();
+            }
             
             // Play dodge sound
             playDodgeSound();
@@ -413,6 +417,8 @@
         // Desktop: Mouse hover detection
         let lastMoveTime = 0;
         document.addEventListener('mousemove', (e) => {
+            if (isPopupOpen) return; // Don't track if popup is open
+            
             // Throttle the event to improve performance
             const now = Date.now();
             if (now - lastMoveTime < 50) return;
@@ -444,7 +450,6 @@
             moveNoButton();
         });
 
-        // Prevent accidental clicks on No button
         noBtn.addEventListener('mousedown', (e) => {
             e.preventDefault();
             moveNoButton();
@@ -452,13 +457,19 @@
 
         // YES button clicked!
         yesBtn.addEventListener('click', () => {
+            isPopupOpen = true;
             popup.style.display = 'flex';
             
-            // Play music with error handling
+            // Initialize audio if not already done
+            if (!audioContextInitialized) {
+                initAudio();
+            }
+            
+            // Play music
             loveMusic.play().then(() => {
                 console.log("Music playing!");
             }).catch(err => {
-                console.log("Music autoplay prevented by browser:", err);
+                console.log("Music autoplay prevented:", err);
             });
             
             // Start all effects
@@ -473,20 +484,26 @@
             const counter = document.getElementById('counter');
             let count = 0;
             const interval = setInterval(() => {
+                if (!isPopupOpen) {
+                    clearInterval(interval);
+                    return;
+                }
                 count += 2;
                 counter.textContent = count;
                 if (count >= 100) {
                     clearInterval(interval);
-                    counter.textContent = '∞'; // Infinity symbol
+                    counter.textContent = '∞';
                 }
             }, 30);
         }
 
         // Fireworks effect
         function createFireworks() {
+            if (!isPopupOpen) return;
             const colors = ['#ff4757', '#ff6b81', '#ffa502', '#ff6348', '#fd79a8', '#fdcb6e'];
             for (let i = 0; i < 10; i++) {
                 setTimeout(() => {
+                    if (!isPopupOpen) return;
                     const firework = document.createElement('div');
                     firework.className = 'firework';
                     firework.style.left = Math.random() * 100 + '%';
@@ -503,9 +520,11 @@
 
         // Confetti
         function createConfetti() {
+            if (!isPopupOpen) return;
             const colors = ['#ff4757', '#ff6b81', '#ffa502', '#ff6348', '#fd79a8', '#fdcb6e'];
             for (let i = 0; i < 150; i++) {
                 setTimeout(() => {
+                    if (!isPopupOpen) return;
                     const confetti = document.createElement('div');
                     confetti.className = 'confetti';
                     confetti.style.left = Math.random() * 100 + '%';
@@ -522,9 +541,11 @@
 
         // Floating hearts
         function createFloatingHearts() {
+            if (!isPopupOpen) return;
             const hearts = ['💕', '💖', '💗', '💝', '💘', '❤️', '💓', '💞'];
             for (let i = 0; i < 30; i++) {
                 setTimeout(() => {
+                    if (!isPopupOpen) return;
                     const heart = document.createElement('div');
                     heart.className = 'floating-heart';
                     heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
@@ -541,25 +562,28 @@
         // Close popup
         popup.addEventListener('click', (e) => {
             if (e.target === popup) {
+                isPopupOpen = false;
                 popup.style.display = 'none';
                 loveMusic.pause();
                 loveMusic.currentTime = 0;
                 
-                // Remove any remaining confetti and hearts
+                // Clean up all effects
                 document.querySelectorAll('.confetti, .floating-heart, .firework').forEach(el => el.remove());
+                
+                // Reset counter
+                document.getElementById('counter').textContent = '0';
             }
         });
 
-        // Debug: Check if image loads
+        // Debug logging
         document.getElementById('valentinePhoto').addEventListener('error', function() {
-            console.error('Image failed to load: IMG-20251118-WA0047.jpg');
+            console.error('Image failed to load');
         });
 
         document.getElementById('valentinePhoto').addEventListener('load', function() {
             console.log('Image loaded successfully!');
         });
 
-        // Debug: Check if audio loads
         loveMusic.addEventListener('error', function(e) {
             console.error('Audio failed to load:', e);
         });
