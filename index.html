@@ -195,17 +195,19 @@
             background: rgba(255, 255, 255, 0.8);
             border-radius: 20px;
             display: none;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .lyrics-line {
-            font-size: 0.75em;
+            font-size: 0.7em;
             color: #333;
-            margin: 5px 0;
+            margin: 3px 0;
             opacity: 0;
             animation: lyric-appear 0.8s ease forwards;
             text-align: center;
             font-style: italic;
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
         @keyframes lyric-appear {
@@ -647,11 +649,11 @@
             document.querySelectorAll('.floating-message').forEach(msg => msg.remove());
             
             const messages = [
-                "Yathu loves you Unconditionally 💕",
-                "Yathu loves you Unconditionally ❤️",
-                "Yathu loves you Unconditionally 💖",
-                "Yathu loves you Unconditionally 💗",
-                "Yathu loves you Unconditionally 💝"
+                "Yathu loves you infinitely 💕",
+                "Yathu loves you infinitely ❤️",
+                "Yathu loves you infinitely 💖",
+                "Yathu loves you infinitely 💗",
+                "Yathu loves you infinitely 💝"
             ];
             
             // Get container boundaries to avoid
@@ -737,14 +739,13 @@
             lyricsContainer.style.display = 'block';
             lyricsContent.innerHTML = '';
             
+            // Show all lyrics immediately
             lyrics.forEach((line, index) => {
-                setTimeout(() => {
-                    const lineDiv = document.createElement('div');
-                    lineDiv.className = 'lyrics-line';
-                    lineDiv.textContent = line;
-                    lineDiv.style.animationDelay = '0s';
-                    lyricsContent.appendChild(lineDiv);
-                }, index * 800); // Show each line every 0.8 seconds (very fast)
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'lyrics-line';
+                lineDiv.textContent = line;
+                lineDiv.style.animationDelay = (index * 0.05) + 's'; // Very fast stagger
+                lyricsContent.appendChild(lineDiv);
             });
         }
     </script>
