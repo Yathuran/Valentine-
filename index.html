@@ -22,7 +22,6 @@
             position: relative;
         }
 
-        /* Animated background hearts */
         .bg-heart {
             position: fixed;
             font-size: 30px;
@@ -41,7 +40,7 @@
             padding: 60px 40px;
             border-radius: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
+            max-width: 600px;
             width: 90%;
             position: relative;
             backdrop-filter: blur(10px);
@@ -77,28 +76,10 @@
 
         h1 {
             color: #ff4757;
-            font-size: 2.5em;
+            font-size: 2.2em;
             margin-bottom: 30px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-
-        /* Typing animation */
-        .typing-text {
-            overflow: hidden;
-            border-right: 3px solid #ff4757;
-            white-space: nowrap;
-            margin: 0 auto;
-            animation: typing 3s steps(30) 1s forwards, blink 0.75s step-end infinite;
-            display: inline-block;
-        }
-
-        @keyframes typing {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-
-        @keyframes blink {
-            50% { border-color: transparent; }
+            min-height: 80px;
         }
 
         .buttons {
@@ -107,8 +88,9 @@
             justify-content: center;
             margin-top: 40px;
             position: relative;
-            min-height: 120px;
+            min-height: 150px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         button {
@@ -119,25 +101,26 @@
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s ease;
+            min-width: 150px;
         }
 
         #yesBtn {
             background: linear-gradient(135deg, #ff4757, #ff6b81);
             color: white;
             box-shadow: 0 5px 20px rgba(255, 71, 87, 0.4);
-            transform: scale(1);
+            position: relative;
+            z-index: 1;
         }
 
         #yesBtn:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
             box-shadow: 0 10px 30px rgba(255, 71, 87, 0.6);
         }
 
         #noBtn {
             background: #ddd;
             color: #666;
-            position: absolute;
-            transition: all 0.3s ease;
+            position: relative;
         }
 
         .popup {
@@ -302,7 +285,7 @@
         }
 
         @media (max-width: 600px) {
-            h1 { font-size: 2em; }
+            h1 { font-size: 1.8em; }
             .container { padding: 40px 20px; }
             button { padding: 12px 30px; font-size: 1em; }
             .popup-content h2 { font-size: 1.8em; }
@@ -311,21 +294,19 @@
     </style>
 </head>
 <body>
-    <!-- Background hearts -->
     <div class="bg-heart" style="top: 10%; left: 10%;">💕</div>
     <div class="bg-heart" style="top: 20%; right: 15%; animation-delay: 2s;">💖</div>
     <div class="bg-heart" style="bottom: 15%; left: 20%; animation-delay: 4s;">💗</div>
     <div class="bg-heart" style="bottom: 25%; right: 10%; animation-delay: 6s;">💝</div>
 
     <div class="container">
-        <!-- Sparkles -->
         <div class="sparkle" style="top: 10%; left: 10%;"></div>
         <div class="sparkle" style="top: 15%; right: 15%; animation-delay: 0.5s;"></div>
         <div class="sparkle" style="bottom: 20%; left: 20%; animation-delay: 1s;"></div>
         <div class="sparkle" style="bottom: 15%; right: 10%; animation-delay: 1.5s;"></div>
 
         <div class="heart">💕</div>
-        <h1><span class="typing-text">Will You Be My Valentine?</span></h1>
+        <h1>Will You Be My Valentine?</h1>
         
         <div class="buttons">
             <button id="yesBtn">Yes! 💖</button>
@@ -356,7 +337,7 @@
     </div>
 
     <audio id="loveMusic" loop>
-        <source src="Entha Pennilum Illatha Ondru.MP3" type="audio/mpeg">
+        <source src="Entha Pennilum Illatha Ondru.mp3" type="audio/mpeg">
     </audio>
 
     <script>
@@ -367,40 +348,60 @@
         const loveMusic = document.getElementById('loveMusic');
         
         let noClickCount = 0;
-        let yesScale = 1;
         let noScale = 1;
 
-        // Move No button and adjust sizes
+        // Create Audio Context for dodge sound effect
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioContext = new AudioContext();
+
+        // Function to play "whoosh" sound when No button dodges
+        function playDodgeSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Create a "whoosh" sound effect
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        // Function to move the "No" button
         function moveNoButton() {
             noClickCount++;
             
-            // Make Yes button BIGGER
-            yesScale += 0.1;
-            yesBtn.style.transform = `scale(${yesScale})`;
+            // Play dodge sound
+            playDodgeSound();
             
-            // Make No button SMALLER
-            noScale = Math.max(0.3, noScale - 0.1);
-            noBtn.style.fontSize = `${1 * noScale}em`;
-            noBtn.style.padding = `${15 * noScale}px ${40 * noScale}px`;
+            // Make No button slightly SMALLER each time
+            noScale = Math.max(0.6, noScale - 0.08);
             
-            // Move to random position
+            // Calculate random position within container
             const containerRect = container.getBoundingClientRect();
-            const maxX = containerRect.width - noBtn.offsetWidth - 80;
-            const maxY = 100;
+            const randomX = (Math.random() - 0.5) * (containerRect.width - 200);
+            const randomY = (Math.random() - 0.5) * 80;
             
-            const randomX = (Math.random() - 0.5) * maxX;
-            const randomY = (Math.random() - 0.5) * maxY;
-            
+            // Apply transform with both translation and scale
             noBtn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${noScale})`;
-            
-            // After 5 tries, make No button nearly invisible
-            if (noClickCount >= 5) {
-                noBtn.style.opacity = '0.3';
-            }
+            noBtn.style.position = 'absolute';
         }
 
-        // Desktop hover
+        // Desktop: Mouse hover detection
+        let lastMoveTime = 0;
         document.addEventListener('mousemove', (e) => {
+            // Throttle the event to improve performance
+            const now = Date.now();
+            if (now - lastMoveTime < 50) return;
+            lastMoveTime = now;
+
             const noRect = noBtn.getBoundingClientRect();
             const noCenterX = noRect.left + noRect.width / 2;
             const noCenterY = noRect.top + noRect.height / 2;
@@ -410,12 +411,13 @@
                 Math.pow(e.clientY - noCenterY, 2)
             );
 
-            if (distance < 100) {
+            // If mouse is within 120px of the "No" button, move it
+            if (distance < 120) {
                 moveNoButton();
             }
         });
 
-        // Mobile tap
+        // Mobile: Touch/Tap detection
         noBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
             moveNoButton();
@@ -426,17 +428,30 @@
             moveNoButton();
         });
 
+        // Prevent accidental clicks on No button
+        noBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            moveNoButton();
+        });
+
         // YES button clicked!
         yesBtn.addEventListener('click', () => {
             popup.style.display = 'flex';
             
-            // Play music
-            loveMusic.play().catch(err => console.log("Music autoplay prevented:", err));
+            // Resume audio context (needed for some browsers)
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
             
-            // Start love counter
+            // Play music with error handling
+            loveMusic.play().then(() => {
+                console.log("Music playing!");
+            }).catch(err => {
+                console.log("Music autoplay prevented by browser:", err);
+            });
+            
+            // Start all effects
             animateLoveCounter();
-            
-            // Create effects
             createFireworks();
             createConfetti();
             createFloatingHearts();
@@ -519,6 +534,24 @@
                 loveMusic.pause();
                 loveMusic.currentTime = 0;
             }
+        });
+
+        // Debug: Check if image loads
+        document.getElementById('valentinePhoto').addEventListener('error', function() {
+            console.error('Image failed to load: IMG-20251118-WA0047.jpg');
+        });
+
+        document.getElementById('valentinePhoto').addEventListener('load', function() {
+            console.log('Image loaded successfully!');
+        });
+
+        // Debug: Check if audio loads
+        loveMusic.addEventListener('error', function(e) {
+            console.error('Audio failed to load:', e);
+        });
+
+        loveMusic.addEventListener('loadeddata', function() {
+            console.log('Audio loaded successfully!');
         });
     </script>
 </body>
