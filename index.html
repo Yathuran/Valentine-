@@ -102,7 +102,7 @@
 
         .heart {
             font-size: 3.5em;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             animation: heartbeat 1.5s ease-in-out infinite;
             filter: drop-shadow(0 0 10px #ff4757);
         }
@@ -117,7 +117,7 @@
         h1 {
             color: #ff4757;
             font-size: 2em;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
@@ -148,10 +148,12 @@
         }
 
         .song-name {
-            font-size: 0.9em;
-            color: #ff4757;
-            margin-top: 20px;
-            font-style: italic;
+            font-size: 1em;
+            color: #000000;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-style: normal;
             animation: fade-in 1s ease-in;
         }
 
@@ -187,7 +189,7 @@
         }
 
         .lyrics-container {
-            margin-top: 20px;
+            margin-top: 10px;
             padding: 20px;
             background: rgba(255, 255, 255, 0.8);
             border-radius: 20px;
@@ -217,10 +219,10 @@
         }
 
         .lyrics-title {
-            font-size: 1em;
+            font-size: 0.9em;
             color: #ff4757;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             text-align: center;
         }
 
@@ -392,7 +394,7 @@
         </div>
         
         <div id="songDisplay" class="song-name" style="display: none;">
-            <span class="music-note">🎵</span> Now Playing: My Love, Keerthy <span class="music-note">🎵</span>
+            <strong>Now Playing: My Love, Keerthy</strong>
         </div>
         
         <div id="lyricsContainer" class="lyrics-container">
@@ -608,6 +610,7 @@
                 createContinuousFireworks();
                 createFloatingMessages();
                 displayLyrics(); // Show lyrics
+                // Target the h1 inside mainContainer specifically
                 mainContainer.querySelector('h1').innerHTML = 'Thank You <span class="royal-name">Keerthy</span>, My Love! <span class="kiss-emoji">💋</span><span class="kiss-emoji">😘</span><span class="kiss-emoji">💕</span>';
             }
         });
