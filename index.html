@@ -186,6 +186,45 @@
             50% { transform: translateY(-30px) rotate(5deg); opacity: 1; }
         }
 
+        .lyrics-container {
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .lyrics-line {
+            font-size: 1.1em;
+            color: #333;
+            margin: 15px 0;
+            opacity: 0;
+            animation: lyric-appear 0.8s ease forwards;
+            text-align: center;
+            font-style: italic;
+        }
+
+        @keyframes lyric-appear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .lyrics-title {
+            font-size: 1.3em;
+            color: #ff4757;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
         .buttons {
             display: flex;
             gap: 20px;
@@ -354,7 +393,12 @@
         </div>
         
         <div id="songDisplay" class="song-name" style="display: none;">
-            <span class="music-note">🎵</span> Now Playing: En iniya Pon Nilave <span class="music-note">🎵</span>
+            <span class="music-note">🎵</span> Now Playing: My Love, Keerthy <span class="music-note">🎵</span>
+        </div>
+        
+        <div id="lyricsContainer" class="lyrics-container">
+            <div class="lyrics-title">🎵 Song Lyrics 🎵</div>
+            <div id="lyricsContent"></div>
         </div>
     </div>
 
@@ -380,7 +424,7 @@
     </div>
 
     <audio id="loveMusic" loop>
-        <source src="En iniya Pon Nilave.mp3" type="audio/mpeg">
+        <source src="keerthy.mp3" type="audio/mpeg">
     </audio>
 
     <audio id="tensionMusic" loop>
@@ -561,6 +605,7 @@
                 document.getElementById('songDisplay').style.display = 'block';
                 createContinuousFireworks();
                 createFloatingMessages();
+                displayLyrics(); // Show lyrics
                 document.querySelector('h1').innerHTML = 'Thank You <span class="royal-name">Keerthy</span>, My Love! <span class="kiss-emoji">💋</span><span class="kiss-emoji">😘</span><span class="kiss-emoji">💕</span>';
             }
         });
@@ -590,7 +635,7 @@
             }, 1000);
         }
 
-        // Floating messages
+        // Floating messages - avoid the white box area
         function createFloatingMessages() {
             const messages = [
                 "Yathu loves you Unconditionally 💕",
@@ -599,18 +644,99 @@
                 "Yathu loves you Unconditionally 💗",
                 "Yathu loves you Unconditionally 💝"
             ];
+            
+            // Get container boundaries to avoid
+            const container = document.getElementById('mainContainer');
+            const containerRect = container.getBoundingClientRect();
+            
             for (let i = 0; i < 15; i++) {
                 setTimeout(() => {
                     const message = document.createElement('div');
                     message.className = 'floating-message';
                     message.textContent = messages[Math.floor(Math.random() * messages.length)];
-                    message.style.left = Math.random() * (window.innerWidth - 300) + 'px';
-                    message.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+                    
+                    // Place messages outside the white box
+                    let x, y;
+                    do {
+                        x = Math.random() * (window.innerWidth - 300);
+                        y = Math.random() * (window.innerHeight - 100);
+                    } while (
+                        x > containerRect.left - 50 && 
+                        x < containerRect.right + 50 &&
+                        y > containerRect.top - 50 && 
+                        y < containerRect.bottom + 50
+                    );
+                    
+                    message.style.left = x + 'px';
+                    message.style.top = y + 'px';
                     message.style.animationDelay = Math.random() * 2 + 's';
                     message.style.animationDuration = (3 + Math.random() * 2) + 's';
                     document.body.appendChild(message);
                 }, i * 200);
             }
+        }
+
+        // Display lyrics line by line
+        function displayLyrics() {
+            const lyrics = [
+                "From the moment you walked into my days",
+                "Everything quiet found a song",
+                "In your smile I found my place",
+                "Like I was where I belonged",
+                "",
+                "You don't even know you shine",
+                "In every little thing you do",
+                "But my world learned how to glow",
+                "The day my heart found you",
+                "",
+                "If forever had a name",
+                "It would sound like you",
+                "Keerthy, my love, my light, my home",
+                "In your arms I'm never alone",
+                "",
+                "Every heartbeat whispers true",
+                "My whole life leads to you",
+                "Through every storm, every dawn above",
+                "I'll hold your hand, my love",
+                "",
+                "Keerthy, my heart was waiting for",
+                "You and nothing more",
+                "",
+                "You're the calm inside my storm",
+                "The warmth when nights are cold",
+                "Every dream I never spoke",
+                "You somehow came and told",
+                "",
+                "If love had eyes and a face",
+                "It would look like you",
+                "If time could pause one place",
+                "I'd pause it where we grew",
+                "",
+                "Keerthy, my love, my light, my home",
+                "In your arms I'm never alone",
+                "Every heartbeat whispers true",
+                "My whole life leads to you",
+                "",
+                "Through every storm, every dawn above",
+                "I'll hold your hand, my love",
+                "Keerthy, my heart is yours to keep",
+                "Now and endlessly",
+            ];
+            
+            const lyricsContainer = document.getElementById('lyricsContainer');
+            const lyricsContent = document.getElementById('lyricsContent');
+            lyricsContainer.style.display = 'block';
+            lyricsContent.innerHTML = '';
+            
+            lyrics.forEach((line, index) => {
+                setTimeout(() => {
+                    const lineDiv = document.createElement('div');
+                    lineDiv.className = 'lyrics-line';
+                    lineDiv.textContent = line;
+                    lineDiv.style.animationDelay = '0s';
+                    lyricsContent.appendChild(lineDiv);
+                }, index * 3000); // Show each line every 3 seconds
+            });
         }
     </script>
 </body>
