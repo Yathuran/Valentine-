@@ -79,7 +79,6 @@
             font-size: 2.2em;
             margin-bottom: 30px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-            min-height: 80px;
         }
 
         .buttons {
@@ -90,7 +89,6 @@
             position: relative;
             min-height: 150px;
             align-items: center;
-            flex-wrap: wrap;
         }
 
         button {
@@ -108,8 +106,6 @@
             background: linear-gradient(135deg, #ff4757, #ff6b81);
             color: white;
             box-shadow: 0 5px 20px rgba(255, 71, 87, 0.4);
-            position: relative;
-            z-index: 1;
         }
 
         #yesBtn:hover {
@@ -134,12 +130,6 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         .popup-content {
@@ -149,38 +139,26 @@
             text-align: center;
             max-width: 600px;
             width: 90%;
-            animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
+            animation: popIn 0.6s ease;
         }
 
         @keyframes popIn {
-            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .popup-content h2 {
             color: #ff4757;
             font-size: 2.5em;
             margin-bottom: 20px;
-            animation: bounce 1s ease infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
         }
 
         .celebration {
             font-size: 5em;
             margin-bottom: 20px;
-            animation: spin 2s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(180deg); }
         }
 
         .photo-frame {
@@ -191,12 +169,6 @@
             background: linear-gradient(135deg, #ffd700, #ffed4e);
             border-radius: 20px;
             box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4);
-            animation: glow 2s ease-in-out infinite;
-        }
-
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4); }
-            50% { box-shadow: 0 15px 60px rgba(255, 215, 0, 0.8); }
         }
 
         .photo-frame img {
@@ -212,42 +184,27 @@
             font-weight: bold;
         }
 
-        .message-container {
-            margin: 20px 0;
-        }
-
         .message {
             font-size: 1.3em;
             color: #333;
             margin: 10px 0;
-            opacity: 0;
-            animation: slideIn 0.8s ease forwards;
-        }
-
-        @keyframes slideIn {
-            from { 
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateX(0);
-            }
         }
 
         .firework {
             position: fixed;
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
-            animation: firework 1s ease-out forwards;
+            pointer-events: none;
         }
 
-        @keyframes firework {
+        @keyframes explode {
             0% {
-                transform: scale(0);
+                transform: translate(0, 0);
                 opacity: 1;
             }
             100% {
-                transform: scale(40);
+                transform: translate(var(--x), var(--y));
                 opacity: 0;
             }
         }
@@ -256,30 +213,12 @@
             position: fixed;
             width: 10px;
             height: 10px;
-            animation: confetti-fall 3s linear forwards;
-        }
-
-        @keyframes confetti-fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        .floating-heart {
-            position: fixed;
-            font-size: 2em;
-            animation: float-up 4s linear forwards;
             pointer-events: none;
         }
 
-        @keyframes float-up {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100vh) rotate(360deg);
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
                 opacity: 0;
             }
         }
@@ -288,8 +227,6 @@
             h1 { font-size: 1.8em; }
             .container { padding: 40px 20px; }
             button { padding: 12px 30px; font-size: 1em; }
-            .popup-content h2 { font-size: 1.8em; }
-            .celebration { font-size: 3em; }
         }
     </style>
 </head>
@@ -320,19 +257,17 @@
             <div class="celebration">🎊 💖 ✨</div>
             
             <div class="photo-frame">
-                <img id="valentinePhoto" src="IMG-20251118-WA0047.jpg" alt="My Beautiful Valentine" />
+                <img src="IMG-20251118-WA0047.jpg" alt="My Beautiful Valentine" />
             </div>
             
             <div class="love-counter">
                 I love you <span id="counter">0</span>% 💕
             </div>
 
-            <div class="message-container">
-                <div class="message" style="animation-delay: 0.5s;">✨ You make my heart skip a beat!</div>
-                <div class="message" style="animation-delay: 1s;">💕 Every moment with you is magical!</div>
-                <div class="message" style="animation-delay: 1.5s;">🌟 You're my everything!</div>
-                <div class="message" style="animation-delay: 2s;">💖 Happy Valentine's Day, my love!</div>
-            </div>
+            <div class="message">✨ You make my heart skip a beat!</div>
+            <div class="message">💕 Every moment with you is magical!</div>
+            <div class="message">🌟 You're my everything!</div>
+            <div class="message">💖 Happy Valentine's Day, my love!</div>
         </div>
     </div>
 
@@ -347,79 +282,23 @@
         const container = document.querySelector('.container');
         const loveMusic = document.getElementById('loveMusic');
         
-        let noClickCount = 0;
         let noScale = 1;
-        let isPopupOpen = false;
-        let audioContextInitialized = false;
 
-        // Initialize Web Audio API on first user gesture
-        let audioContext;
-        function initAudio() {
-            if (!audioContextInitialized) {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                audioContext = new AudioContext();
-                audioContextInitialized = true;
-            }
-        }
-
-        // Function to play "whoosh" sound when No button dodges
-        function playDodgeSound() {
-            if (!audioContextInitialized) return;
-            
-            try {
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-                oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
-                
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-                
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.1);
-            } catch (e) {
-                console.log("Sound play failed:", e);
-            }
-        }
-
-        // Function to move the "No" button
+        // Move No button
         function moveNoButton() {
-            if (isPopupOpen) return; // Don't move if popup is open
-            
-            noClickCount++;
-            
-            // Initialize audio on first dodge attempt
-            if (!audioContextInitialized) {
-                initAudio();
-            }
-            
-            // Play dodge sound
-            playDodgeSound();
-            
-            // Make No button slightly SMALLER each time
             noScale = Math.max(0.6, noScale - 0.08);
             
-            // Calculate random position within container
             const containerRect = container.getBoundingClientRect();
             const randomX = (Math.random() - 0.5) * (containerRect.width - 200);
             const randomY = (Math.random() - 0.5) * 80;
             
-            // Apply transform with both translation and scale
             noBtn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${noScale})`;
             noBtn.style.position = 'absolute';
         }
 
-        // Desktop: Mouse hover detection
+        // Mouse hover detection
         let lastMoveTime = 0;
         document.addEventListener('mousemove', (e) => {
-            if (isPopupOpen) return; // Don't track if popup is open
-            
-            // Throttle the event to improve performance
             const now = Date.now();
             if (now - lastMoveTime < 50) return;
             lastMoveTime = now;
@@ -433,13 +312,11 @@
                 Math.pow(e.clientY - noCenterY, 2)
             );
 
-            // If mouse is within 120px of the "No" button, move it
             if (distance < 120) {
                 moveNoButton();
             }
         });
 
-        // Mobile: Touch/Tap detection
         noBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
             moveNoButton();
@@ -450,44 +327,29 @@
             moveNoButton();
         });
 
-        noBtn.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            moveNoButton();
-        });
-
-        // YES button clicked!
+        // YES button - SHOW CELEBRATION!
         yesBtn.addEventListener('click', () => {
-            isPopupOpen = true;
+            console.log("YES clicked!");
             popup.style.display = 'flex';
             
-            // Initialize audio if not already done
-            if (!audioContextInitialized) {
-                initAudio();
-            }
-            
             // Play music
-            loveMusic.play().then(() => {
-                console.log("Music playing!");
-            }).catch(err => {
-                console.log("Music autoplay prevented:", err);
+            loveMusic.play().catch(err => {
+                console.log("Music error:", err);
             });
             
-            // Start all effects
-            animateLoveCounter();
-            createFireworks();
-            createConfetti();
-            createFloatingHearts();
+            // Start effects
+            setTimeout(() => {
+                animateLoveCounter();
+                createFireworks();
+                createConfetti();
+            }, 100);
         });
 
-        // Animate love counter to 100%
+        // Love counter animation
         function animateLoveCounter() {
             const counter = document.getElementById('counter');
             let count = 0;
             const interval = setInterval(() => {
-                if (!isPopupOpen) {
-                    clearInterval(interval);
-                    return;
-                }
                 count += 2;
                 counter.textContent = count;
                 if (count >= 100) {
@@ -497,99 +359,69 @@
             }, 30);
         }
 
-        // Fireworks effect
+        // Create FIREWORKS
         function createFireworks() {
-            if (!isPopupOpen) return;
+            console.log("Creating fireworks!");
             const colors = ['#ff4757', '#ff6b81', '#ffa502', '#ff6348', '#fd79a8', '#fdcb6e'];
-            for (let i = 0; i < 10; i++) {
+            
+            for (let i = 0; i < 15; i++) {
                 setTimeout(() => {
-                    if (!isPopupOpen) return;
-                    const firework = document.createElement('div');
-                    firework.className = 'firework';
-                    firework.style.left = Math.random() * 100 + '%';
-                    firework.style.top = Math.random() * 100 + '%';
-                    firework.style.width = '10px';
-                    firework.style.height = '10px';
-                    firework.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    document.body.appendChild(firework);
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight * 0.6;
                     
-                    setTimeout(() => firework.remove(), 1000);
-                }, i * 300);
+                    // Create explosion
+                    for (let j = 0; j < 30; j++) {
+                        const particle = document.createElement('div');
+                        particle.className = 'firework';
+                        particle.style.left = x + 'px';
+                        particle.style.top = y + 'px';
+                        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                        
+                        const angle = (Math.PI * 2 * j) / 30;
+                        const velocity = 50 + Math.random() * 100;
+                        const xVel = Math.cos(angle) * velocity;
+                        const yVel = Math.sin(angle) * velocity;
+                        
+                        particle.style.setProperty('--x', xVel + 'px');
+                        particle.style.setProperty('--y', yVel + 'px');
+                        particle.style.animation = 'explode 1s ease-out forwards';
+                        
+                        document.body.appendChild(particle);
+                        setTimeout(() => particle.remove(), 1000);
+                    }
+                }, i * 200);
             }
         }
 
-        // Confetti
+        // Create CONFETTI
         function createConfetti() {
-            if (!isPopupOpen) return;
+            console.log("Creating confetti!");
             const colors = ['#ff4757', '#ff6b81', '#ffa502', '#ff6348', '#fd79a8', '#fdcb6e'];
-            for (let i = 0; i < 150; i++) {
+            
+            for (let i = 0; i < 100; i++) {
                 setTimeout(() => {
-                    if (!isPopupOpen) return;
                     const confetti = document.createElement('div');
                     confetti.className = 'confetti';
                     confetti.style.left = Math.random() * 100 + '%';
                     confetti.style.top = '-10px';
                     confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    confetti.style.animation = `fall ${2 + Math.random() * 2}s linear forwards`;
                     confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
                     document.body.appendChild(confetti);
-                    
-                    setTimeout(() => confetti.remove(), 3000);
-                }, i * 20);
-            }
-        }
-
-        // Floating hearts
-        function createFloatingHearts() {
-            if (!isPopupOpen) return;
-            const hearts = ['💕', '💖', '💗', '💝', '💘', '❤️', '💓', '💞'];
-            for (let i = 0; i < 30; i++) {
-                setTimeout(() => {
-                    if (!isPopupOpen) return;
-                    const heart = document.createElement('div');
-                    heart.className = 'floating-heart';
-                    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
-                    heart.style.left = Math.random() * 100 + '%';
-                    heart.style.bottom = '0';
-                    heart.style.animationDelay = Math.random() * 2 + 's';
-                    document.body.appendChild(heart);
-                    
-                    setTimeout(() => heart.remove(), 4000);
-                }, i * 200);
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 30);
             }
         }
 
         // Close popup
         popup.addEventListener('click', (e) => {
             if (e.target === popup) {
-                isPopupOpen = false;
                 popup.style.display = 'none';
                 loveMusic.pause();
                 loveMusic.currentTime = 0;
-                
-                // Clean up all effects
-                document.querySelectorAll('.confetti, .floating-heart, .firework').forEach(el => el.remove());
-                
-                // Reset counter
                 document.getElementById('counter').textContent = '0';
+                document.querySelectorAll('.confetti, .firework').forEach(el => el.remove());
             }
-        });
-
-        // Debug logging
-        document.getElementById('valentinePhoto').addEventListener('error', function() {
-            console.error('Image failed to load');
-        });
-
-        document.getElementById('valentinePhoto').addEventListener('load', function() {
-            console.log('Image loaded successfully!');
-        });
-
-        loveMusic.addEventListener('error', function(e) {
-            console.error('Audio failed to load:', e);
-        });
-
-        loveMusic.addEventListener('loadeddata', function() {
-            console.log('Audio loaded successfully!');
         });
     </script>
 </body>
