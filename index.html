@@ -366,85 +366,44 @@
         <source src="En iniya Pon Nilave.mp3" type="audio/mpeg">
     </audio>
 
+    <audio id="tensionMusic" loop>
+        <source src="lnplusmusic-suspense-tension-background-music-323181.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
         const yesBtn = document.getElementById('yesBtn');
         const noBtn = document.getElementById('noBtn');
         const popup = document.getElementById('popup');
         const container = document.querySelector('.container');
         const loveMusic = document.getElementById('loveMusic');
+        const tensionMusic = document.getElementById('tensionMusic');
         
         let noScale = 1;
-        let tensionAudioContext;
-        let tensionOscillator;
-        let tensionGainNode;
         let tensionStarted = false;
 
-        // Create simple tension music
-        function createTensionMusic() {
-            try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                tensionAudioContext = new AudioContext();
-                
-                // Create oscillator for tension sound
-                tensionOscillator = tensionAudioContext.createOscillator();
-                tensionGainNode = tensionAudioContext.createGain();
-                
-                // Low frequency for suspense
-                tensionOscillator.type = 'sine';
-                tensionOscillator.frequency.value = 110; // Low A note
-                
-                // Start very quiet
-                tensionGainNode.gain.value = 0.1;
-                
-                tensionOscillator.connect(tensionGainNode);
-                tensionGainNode.connect(tensionAudioContext.destination);
-                
-                tensionOscillator.start();
-                console.log("Tension music started!");
-                
-                // Add pulsing effect
-                setInterval(() => {
-                    if (tensionGainNode && !popup.style.display.includes('flex')) {
-                        const currentGain = tensionGainNode.gain.value;
-                        tensionGainNode.gain.setValueAtTime(currentGain, tensionAudioContext.currentTime);
-                        tensionGainNode.gain.linearRampToValueAtTime(currentGain * 0.7, tensionAudioContext.currentTime + 0.5);
-                        tensionGainNode.gain.linearRampToValueAtTime(currentGain, tensionAudioContext.currentTime + 1);
-                    }
-                }, 1000);
-                
-            } catch(e) {
-                console.log("Tension music error:", e);
+        // Start tension music on first interaction
+        function startTensionMusic() {
+            if (!tensionStarted) {
+                tensionStarted = true;
+                tensionMusic.volume = 0.3; // Start at 30% volume
+                tensionMusic.play().then(() => {
+                    console.log("Tension music started!");
+                }).catch(err => {
+                    console.log("Tension music error:", err);
+                });
             }
         }
 
         // Stop tension music
         function stopTensionMusic() {
-            try {
-                if (tensionOscillator) {
-                    tensionOscillator.stop();
-                    tensionOscillator = null;
-                }
-                if (tensionAudioContext) {
-                    tensionAudioContext.close();
-                    tensionAudioContext = null;
-                }
-                console.log("Tension music stopped!");
-            } catch(e) {
-                console.log("Error stopping tension:", e);
-            }
+            tensionMusic.pause();
+            tensionMusic.currentTime = 0;
+            console.log("Tension music stopped!");
         }
 
-        // Start tension on first mouse movement (before clicking)
-        function startTension() {
-            if (!tensionStarted) {
-                tensionStarted = true;
-                createTensionMusic();
-            }
-        }
-
-        // Start on first mouse move (happens before clicking buttons)
-        document.addEventListener('mousemove', startTension, { once: true });
-        document.addEventListener('touchstart', startTension, { once: true });
+        // Start tension on first mouse movement
+        document.addEventListener('mousemove', startTensionMusic, { once: true });
+        document.addEventListener('touchstart', startTensionMusic, { once: true });
 
         // Move No button
         function moveNoButton() {
@@ -458,10 +417,9 @@
             noBtn.style.position = 'absolute';
             
             // Increase tension music volume each time No is avoided
-            if (tensionGainNode && tensionAudioContext) {
-                const newVolume = Math.min(0.25, tensionGainNode.gain.value + 0.03);
-                tensionGainNode.gain.value = newVolume;
-                console.log("Tension increased to:", newVolume);
+            if (tensionMusic && !tensionMusic.paused) {
+                tensionMusic.volume = Math.min(0.6, tensionMusic.volume + 0.05);
+                console.log("Tension increased to:", tensionMusic.volume);
             }
         }
 
@@ -602,7 +560,7 @@
                 // Continue fireworks on main screen
                 createContinuousFireworks();
                 
-                // Create floating "Yathu loves you Unconditionally" messages
+                // Create floating "Yathu loves you infinitely" messages
                 createFloatingMessages();
                 
                 // Change the question with animated kiss emojis
@@ -644,14 +602,14 @@
             }, 1000);
         }
 
-        // Create floating "Yathu loves you Unconditionally" messages all over
+        // Create floating "Yathu loves you infinitely" messages all over
         function createFloatingMessages() {
             const messages = [
-                "Yathu loves you Unconditionally 💕",
-                "Yathu loves you Unconditionally ❤️",
-                "Yathu loves you Unconditionally 💖",
-                "Yathu loves you Unconditionally 💗",
-                "Yathu loves you Unconditionally 💝"
+                "Yathu loves you infinitely 💕",
+                "Yathu loves you infinitely ❤️",
+                "Yathu loves you infinitely 💖",
+                "Yathu loves you infinitely 💗",
+                "Yathu loves you infinitely 💝"
             ];
 
             // Create 15 floating messages at random positions
