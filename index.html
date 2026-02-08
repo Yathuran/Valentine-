@@ -344,14 +344,93 @@
         <source src="Entha Pennilum Illatha Ondru.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- Tension Music - You can replace this URL with any suspense/tension music -->
+    <audio id="tensionMusic" loop autoplay>
+        <!-- Option 1: Use a free tension music URL (replace with your choice) -->
+        <!-- <source src="YOUR_TENSION_MUSIC.mp3" type="audio/mpeg"> -->
+    </audio>
+
     <script>
         const yesBtn = document.getElementById('yesBtn');
         const noBtn = document.getElementById('noBtn');
         const popup = document.getElementById('popup');
         const container = document.querySelector('.container');
         const loveMusic = document.getElementById('loveMusic');
+        const tensionMusic = document.getElementById('tensionMusic');
         
         let noScale = 1;
+        let tensionAudioContext;
+        let tensionOscillators = [];
+        let tensionGainNode;
+
+        // Create tension/suspense music using Web Audio API
+        function createTensionMusic() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            tensionAudioContext = new AudioContext();
+            tensionGainNode = tensionAudioContext.createGain();
+            tensionGainNode.gain.value = 0.15; // Low volume for background
+            tensionGainNode.connect(tensionAudioContext.destination);
+
+            // Create a tense, suspenseful chord progression
+            const frequencies = [
+                [220, 277, 330], // Am chord
+                [196, 247, 294], // G chord
+                [208, 262, 311], // Ab chord
+            ];
+
+            let chordIndex = 0;
+
+            function playChord() {
+                // Stop previous oscillators
+                tensionOscillators.forEach(osc => {
+                    try { osc.stop(); } catch(e) {}
+                });
+                tensionOscillators = [];
+
+                // Create new chord
+                const currentFreqs = frequencies[chordIndex];
+                currentFreqs.forEach(freq => {
+                    const osc = tensionAudioContext.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    osc.connect(tensionGainNode);
+                    osc.start();
+                    tensionOscillators.push(osc);
+                });
+
+                chordIndex = (chordIndex + 1) % frequencies.length;
+            }
+
+            // Play chord progression every 2 seconds
+            playChord();
+            return setInterval(playChord, 2000);
+        }
+
+        // Stop tension music
+        function stopTensionMusic() {
+            tensionOscillators.forEach(osc => {
+                try { osc.stop(); } catch(e) {}
+            });
+            tensionOscillators = [];
+            if (tensionAudioContext) {
+                tensionAudioContext.close();
+            }
+        }
+
+        // Start tension music on first interaction
+        let tensionInterval;
+        let tensionStarted = false;
+        function startTension() {
+            if (!tensionStarted) {
+                tensionStarted = true;
+                tensionInterval = createTensionMusic();
+            }
+        }
+
+        // Listen for first interaction to start tension music
+        document.addEventListener('mousemove', startTension, { once: true });
+        document.addEventListener('click', startTension, { once: true });
+        document.addEventListener('touchstart', startTension, { once: true });
 
         // Move No button
         function moveNoButton() {
@@ -363,6 +442,11 @@
             
             noBtn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${noScale})`;
             noBtn.style.position = 'absolute';
+            
+            // Increase tension music volume slightly each time
+            if (tensionGainNode) {
+                tensionGainNode.gain.value = Math.min(0.3, tensionGainNode.gain.value + 0.02);
+            }
         }
 
         // Mouse hover detection
@@ -399,9 +483,14 @@
         // YES button - SHOW CELEBRATION!
         yesBtn.addEventListener('click', () => {
             console.log("YES clicked!");
+            
+            // Stop tension music
+            stopTensionMusic();
+            if (tensionInterval) clearInterval(tensionInterval);
+            
             popup.style.display = 'flex';
             
-            // Play music
+            // Play love music
             loveMusic.play().catch(err => {
                 console.log("Music error:", err);
             });
