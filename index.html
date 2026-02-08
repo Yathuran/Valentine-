@@ -146,6 +146,28 @@
             50% { transform: translateY(-5px); }
         }
 
+        .floating-message {
+            position: fixed;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ff4757;
+            pointer-events: none;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: float-message 4s ease-in-out infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes float-message {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(-30px) rotate(5deg);
+                opacity: 1;
+            }
+        }
+
         .buttons {
             display: flex;
             gap: 20px;
@@ -412,7 +434,7 @@
             }
         }
 
-        // Start tension on first click
+        // Start tension on first mouse movement (before clicking)
         function startTension() {
             if (!tensionStarted) {
                 tensionStarted = true;
@@ -420,8 +442,8 @@
             }
         }
 
-        // Start on first mouse move or click
-        document.addEventListener('click', startTension, { once: true });
+        // Start on first mouse move (happens before clicking buttons)
+        document.addEventListener('mousemove', startTension, { once: true });
         document.addEventListener('touchstart', startTension, { once: true });
 
         // Move No button
@@ -580,6 +602,9 @@
                 // Continue fireworks on main screen
                 createContinuousFireworks();
                 
+                // Create floating "Yathu loves you infinitely" messages
+                createFloatingMessages();
+                
                 // Change the question with animated kiss emojis
                 document.querySelector('h1').innerHTML = 'Thank You <span class="royal-name">Keerthy</span>, My Love! <span class="kiss-emoji">💋</span><span class="kiss-emoji">😘</span><span class="kiss-emoji">💕</span>';
             }
@@ -617,6 +642,36 @@
                     setTimeout(() => particle.remove(), 1000);
                 }
             }, 1000);
+        }
+
+        // Create floating "Yathu loves you infinitely" messages all over
+        function createFloatingMessages() {
+            const messages = [
+                "Yathu loves you infinitely 💕",
+                "Yathu loves you infinitely ❤️",
+                "Yathu loves you infinitely 💖",
+                "Yathu loves you infinitely 💗",
+                "Yathu loves you infinitely 💝"
+            ];
+
+            // Create 15 floating messages at random positions
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const message = document.createElement('div');
+                    message.className = 'floating-message';
+                    message.textContent = messages[Math.floor(Math.random() * messages.length)];
+                    
+                    // Random position
+                    message.style.left = Math.random() * (window.innerWidth - 300) + 'px';
+                    message.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+                    
+                    // Random animation delay and duration
+                    message.style.animationDelay = Math.random() * 2 + 's';
+                    message.style.animationDuration = (3 + Math.random() * 2) + 's';
+                    
+                    document.body.appendChild(message);
+                }, i * 200);
+            }
         }
     </script>
 </body>
