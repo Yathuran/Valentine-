@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f0f0f0;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🎵 Audio Files Test</h1>
+    
+    <div class="test-box">
+        <h2>Test 1: Tension Music</h2>
+        <button onclick="testTension()">Play Tension Music</button>
+        <div id="tensionStatus"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 2: Love Music</h2>
+        <button onclick="testLove()">Play Love Music</button>
+        <div id="loveStatus"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 3: Check Files</h2>
+        <button onclick="checkFiles()">Check If Files Exist</button>
+        <div id="fileStatus"></div>
+    </div>
+
+    <audio id="tensionMusic">
+        <source src="Inplusmusic-suspense-tension-background-music-323181.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="loveMusic">
+        <source src="En iniya Pon Nilave.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const tensionMusic = document.getElementById('tensionMusic');
+        const loveMusic = document.getElementById('loveMusic');
+
+        function testTension() {
+            const status = document.getElementById('tensionStatus');
+            status.innerHTML = 'Testing...';
+            
+            tensionMusic.volume = 0.5;
+            tensionMusic.play()
+                .then(() => {
+                    status.innerHTML = '<div class="status success">✅ SUCCESS! Tension music is playing!</div>';
+                    console.log("✅ Tension music loaded and playing");
+                })
+                .catch(err => {
+                    status.innerHTML = '<div class="status error">❌ ERROR: ' + err.message + '</div>';
+                    console.error("❌ Tension music error:", err);
+                });
+        }
+
+        function testLove() {
+            const status = document.getElementById('loveStatus');
+            status.innerHTML = 'Testing...';
+            
+            loveMusic.volume = 0.5;
+            loveMusic.play()
+                .then(() => {
+                    status.innerHTML = '<div class="status success">✅ SUCCESS! Love music is playing!</div>';
+                    console.log("✅ Love music loaded and playing");
+                })
+                .catch(err => {
+                    status.innerHTML = '<div class="status error">❌ ERROR: ' + err.message + '</div>';
+                    console.error("❌ Love music error:", err);
+                });
+        }
+
+        async function checkFiles() {
+            const status = document.getElementById('fileStatus');
+            status.innerHTML = 'Checking files...';
+            
+            const files = [
+                'Inplusmusic-suspense-tension-background-music-323181.mp3',
+                'En iniya Pon Nilave.mp3',
+                'IMG-20251118-WA0047.jpg'
+            ];
+            
+            let html = '';
+            
+            for (const file of files) {
+                try {
+                    const response = await fetch(file, { method: 'HEAD' });
+                    if (response.ok) {
+                        html += `<div class="status success">✅ Found: ${file}</div>`;
+                        console.log("✅ File exists:", file);
+                    } else {
+                        html += `<div class="status error">❌ NOT FOUND (${response.status}): ${file}</div>`;
+                        console.error("❌ File not found:", file, response.status);
+                    }
+                } catch (err) {
+                    html += `<div class="status error">❌ ERROR checking: ${file} - ${err.message}</div>`;
+                    console.error("❌ Error checking file:", file, err);
+                }
+            }
+            
+            status.innerHTML = html;
+        }
+
+        // Auto-check on load
+        window.addEventListener('load', () => {
+            console.log("Page loaded, checking audio elements...");
+            console.log("Tension music src:", tensionMusic.src);
+            console.log("Love music src:", loveMusic.src);
+            
+            tensionMusic.addEventListener('error', (e) => {
+                console.error("❌ Tension music load error:", e);
+            });
+            
+            loveMusic.addEventListener('error', (e) => {
+                console.error("❌ Love music load error:", e);
+            });
+            
+            tensionMusic.addEventListener('loadeddata', () => {
+                console.log("✅ Tension music loaded successfully!");
+            });
+            
+            loveMusic.addEventListener('loadeddata', () => {
+                console.log("✅ Love music loaded successfully!");
+            });
+        });
+    </script>
+</body>
+</html>
