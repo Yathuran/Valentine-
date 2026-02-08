@@ -77,13 +77,14 @@
             display: none;
             text-align: center;
             background: rgba(255, 255, 255, 0.95);
-            padding: 40px 30px;
+            padding: 25px 20px;
             border-radius: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             max-width: 600px;
             width: 90%;
             position: relative;
             backdrop-filter: blur(10px);
+            margin-top: -50px;
         }
 
         .sparkle {
@@ -101,8 +102,8 @@
         }
 
         .heart {
-            font-size: 3.5em;
-            margin-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 5px;
             animation: heartbeat 1.5s ease-in-out infinite;
             filter: drop-shadow(0 0 10px #ff4757);
         }
@@ -116,8 +117,8 @@
 
         h1 {
             color: #ff4757;
-            font-size: 2em;
-            margin-bottom: 10px;
+            font-size: 1.6em;
+            margin-bottom: 5px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
@@ -132,7 +133,7 @@
 
         .kiss-emoji {
             display: inline-block;
-            font-size: 1.2em;
+            font-size: 1em;
             animation: kiss-float 2s ease-in-out infinite;
         }
 
@@ -148,10 +149,10 @@
         }
 
         .song-name {
-            font-size: 1em;
+            font-size: 0.85em;
             color: #000000;
             font-weight: bold;
-            margin-top: 10px;
+            margin-top: 5px;
             margin-bottom: 5px;
             font-style: normal;
             animation: fade-in 1s ease-in;
@@ -189,22 +190,22 @@
         }
 
         .lyrics-container {
-            margin-top: 10px;
-            padding: 20px;
+            margin-top: 5px;
+            padding: 15px;
             background: rgba(255, 255, 255, 0.8);
             border-radius: 20px;
             display: none;
         }
 
         .lyrics-line {
-            font-size: 0.85em;
+            font-size: 0.75em;
             color: #333;
-            margin: 8px 0;
+            margin: 5px 0;
             opacity: 0;
             animation: lyric-appear 0.8s ease forwards;
             text-align: center;
             font-style: italic;
-            line-height: 1.3;
+            line-height: 1.2;
         }
 
         @keyframes lyric-appear {
@@ -219,10 +220,10 @@
         }
 
         .lyrics-title {
-            font-size: 0.9em;
+            font-size: 0.8em;
             color: #ff4757;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-align: center;
         }
 
@@ -743,7 +744,7 @@
                     lineDiv.textContent = line;
                     lineDiv.style.animationDelay = '0s';
                     lyricsContent.appendChild(lineDiv);
-                }, index * 1500); // Show each line every 1.5 seconds (faster)
+                }, index * 800); // Show each line every 0.8 seconds (very fast)
             });
         }
     </script>
