@@ -22,6 +22,45 @@
             position: relative;
         }
 
+        .start-screen {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 80px 60px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .start-screen h1 {
+            color: #ff4757;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: white;
+            padding: 20px 60px;
+            font-size: 1.5em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(255, 71, 87, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(255, 71, 87, 0.6);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
         .bg-heart {
             position: fixed;
             font-size: 30px;
@@ -35,6 +74,7 @@
         }
 
         .container {
+            display: none;
             text-align: center;
             background: rgba(255, 255, 255, 0.95);
             padding: 60px 40px;
@@ -96,31 +136,15 @@
             animation: kiss-float 2s ease-in-out infinite;
         }
 
-        .kiss-emoji:nth-child(1) {
-            animation-delay: 0s;
-        }
-
-        .kiss-emoji:nth-child(2) {
-            animation-delay: 0.3s;
-        }
-
-        .kiss-emoji:nth-child(3) {
-            animation-delay: 0.6s;
-        }
+        .kiss-emoji:nth-child(1) { animation-delay: 0s; }
+        .kiss-emoji:nth-child(2) { animation-delay: 0.3s; }
+        .kiss-emoji:nth-child(3) { animation-delay: 0.6s; }
 
         @keyframes kiss-float {
-            0%, 100% {
-                transform: translateY(0) scale(1) rotate(0deg);
-            }
-            25% {
-                transform: translateY(-10px) scale(1.2) rotate(10deg);
-            }
-            50% {
-                transform: translateY(-5px) scale(1.1) rotate(-5deg);
-            }
-            75% {
-                transform: translateY(-15px) scale(1.3) rotate(5deg);
-            }
+            0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+            25% { transform: translateY(-10px) scale(1.2) rotate(10deg); }
+            50% { transform: translateY(-5px) scale(1.1) rotate(-5deg); }
+            75% { transform: translateY(-15px) scale(1.3) rotate(5deg); }
         }
 
         .song-name {
@@ -158,14 +182,8 @@
         }
 
         @keyframes float-message {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 0.6;
-            }
-            50% {
-                transform: translateY(-30px) rotate(5deg);
-                opacity: 1;
-            }
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+            50% { transform: translateY(-30px) rotate(5deg); opacity: 1; }
         }
 
         .buttons {
@@ -286,14 +304,8 @@
         }
 
         @keyframes explode {
-            0% {
-                transform: translate(0, 0);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--x), var(--y));
-                opacity: 0;
-            }
+            0% { transform: translate(0, 0); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)); opacity: 0; }
         }
 
         .confetti {
@@ -304,10 +316,7 @@
         }
 
         @keyframes fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
+            to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
 
         @media (max-width: 600px) {
@@ -323,7 +332,14 @@
     <div class="bg-heart" style="bottom: 15%; left: 20%; animation-delay: 4s;">💗</div>
     <div class="bg-heart" style="bottom: 25%; right: 10%; animation-delay: 6s;">💝</div>
 
-    <div class="container">
+    <!-- START SCREEN -->
+    <div class="start-screen" id="startScreen">
+        <h1>💕 Valentine's Surprise 💕</h1>
+        <button class="start-btn" id="startBtn">Click to Start 🎵</button>
+    </div>
+
+    <!-- MAIN SCREEN -->
+    <div class="container" id="mainContainer">
         <div class="sparkle" style="top: 10%; left: 10%;"></div>
         <div class="sparkle" style="top: 15%; right: 15%; animation-delay: 0.5s;"></div>
         <div class="sparkle" style="bottom: 20%; left: 20%; animation-delay: 1s;"></div>
@@ -342,6 +358,7 @@
         </div>
     </div>
 
+    <!-- POPUP -->
     <div class="popup" id="popup">
         <div class="popup-content">
             <h2>🎉 You Made The BEST Decision <span class="royal-name">Keerthy</span>! 🎉</h2>
@@ -371,6 +388,9 @@
     </audio>
 
     <script>
+        const startScreen = document.getElementById('startScreen');
+        const startBtn = document.getElementById('startBtn');
+        const mainContainer = document.getElementById('mainContainer');
         const yesBtn = document.getElementById('yesBtn');
         const noBtn = document.getElementById('noBtn');
         const popup = document.getElementById('popup');
@@ -379,53 +399,48 @@
         const tensionMusic = document.getElementById('tensionMusic');
         
         let noScale = 1;
-        let tensionStarted = false;
 
-        // Start tension music on first interaction
-        function startTensionMusic() {
-            if (!tensionStarted) {
-                tensionStarted = true;
-                tensionMusic.volume = 0.3; // Start at 30% volume
-                tensionMusic.play().then(() => {
-                    console.log("Tension music started!");
-                }).catch(err => {
-                    console.log("Tension music error:", err);
-                });
-            }
-        }
-
-        // Stop tension music
-        function stopTensionMusic() {
-            tensionMusic.pause();
-            tensionMusic.currentTime = 0;
-            console.log("Tension music stopped!");
-        }
-
-        // Start tension on first mouse movement
-        document.addEventListener('mousemove', startTensionMusic, { once: true });
-        document.addEventListener('touchstart', startTensionMusic, { once: true });
+        // START BUTTON - Bypass autoplay restrictions
+        startBtn.addEventListener('click', () => {
+            console.log("Start button clicked!");
+            
+            // Hide start screen
+            startScreen.style.display = 'none';
+            mainContainer.style.display = 'block';
+            
+            // Start tension music NOW (user interaction allows it)
+            tensionMusic.volume = 0.4;
+            tensionMusic.play().then(() => {
+                console.log("✅ Tension music playing!");
+            }).catch(err => {
+                console.error("❌ Tension music error:", err);
+                alert("Please enable sound/audio in your browser!");
+            });
+        });
 
         // Move No button
         function moveNoButton() {
             noScale = Math.max(0.6, noScale - 0.08);
             
-            const containerRect = container.getBoundingClientRect();
+            const containerRect = mainContainer.getBoundingClientRect();
             const randomX = (Math.random() - 0.5) * (containerRect.width - 200);
             const randomY = (Math.random() - 0.5) * 80;
             
             noBtn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${noScale})`;
             noBtn.style.position = 'absolute';
             
-            // Increase tension music volume each time No is avoided
+            // Increase tension music volume
             if (tensionMusic && !tensionMusic.paused) {
-                tensionMusic.volume = Math.min(0.6, tensionMusic.volume + 0.05);
-                console.log("Tension increased to:", tensionMusic.volume);
+                tensionMusic.volume = Math.min(0.7, tensionMusic.volume + 0.05);
+                console.log("Tension volume:", tensionMusic.volume);
             }
         }
 
         // Mouse hover detection
         let lastMoveTime = 0;
         document.addEventListener('mousemove', (e) => {
+            if (startScreen.style.display !== 'none') return;
+            
             const now = Date.now();
             if (now - lastMoveTime < 50) return;
             lastMoveTime = now;
@@ -454,21 +469,25 @@
             moveNoButton();
         });
 
-        // YES button - SHOW CELEBRATION!
+        // YES button
         yesBtn.addEventListener('click', () => {
             console.log("YES clicked!");
             
             // Stop tension music
-            stopTensionMusic();
+            tensionMusic.pause();
+            tensionMusic.currentTime = 0;
+            console.log("✅ Tension stopped!");
             
             popup.style.display = 'flex';
             
             // Play love music
-            loveMusic.play().catch(err => {
-                console.log("Music error:", err);
+            loveMusic.volume = 0.6;
+            loveMusic.play().then(() => {
+                console.log("✅ Love music playing!");
+            }).catch(err => {
+                console.error("❌ Love music error:", err);
             });
             
-            // Start effects
             setTimeout(() => {
                 animateLoveCounter();
                 createFireworks();
@@ -476,7 +495,7 @@
             }, 100);
         });
 
-        // Love counter animation
+        // Love counter
         function animateLoveCounter() {
             const counter = document.getElementById('counter');
             let count = 0;
@@ -490,33 +509,24 @@
             }, 30);
         }
 
-        // Create FIREWORKS
+        // Fireworks
         function createFireworks() {
-            console.log("Creating fireworks!");
             const colors = ['#ff4757', '#ff6b81', '#ffa502', '#ff6348', '#fd79a8', '#fdcb6e'];
-            
             for (let i = 0; i < 15; i++) {
                 setTimeout(() => {
                     const x = Math.random() * window.innerWidth;
                     const y = Math.random() * window.innerHeight * 0.6;
-                    
-                    // Create explosion
                     for (let j = 0; j < 30; j++) {
                         const particle = document.createElement('div');
                         particle.className = 'firework';
                         particle.style.left = x + 'px';
                         particle.style.top = y + 'px';
                         particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-                        
                         const angle = (Math.PI * 2 * j) / 30;
                         const velocity = 50 + Math.random() * 100;
-                        const xVel = Math.cos(angle) * velocity;
-                        const yVel = Math.sin(angle) * velocity;
-                        
-                        particle.style.setProperty('--x', xVel + 'px');
-                        particle.style.setProperty('--y', yVel + 'px');
+                        particle.style.setProperty('--x', Math.cos(angle) * velocity + 'px');
+                        particle.style.setProperty('--y', Math.sin(angle) * velocity + 'px');
                         particle.style.animation = 'explode 1s ease-out forwards';
-                        
                         document.body.appendChild(particle);
                         setTimeout(() => particle.remove(), 1000);
                     }
@@ -524,11 +534,9 @@
             }
         }
 
-        // Create CONFETTI
+        // Confetti
         function createConfetti() {
-            console.log("Creating confetti!");
             const colors = ['#ff4757', '#ff6b81', '#ffa502', '#ff6348', '#fd79a8', '#fdcb6e'];
-            
             for (let i = 0; i < 100; i++) {
                 setTimeout(() => {
                     const confetti = document.createElement('div');
@@ -548,85 +556,58 @@
         popup.addEventListener('click', (e) => {
             if (e.target === popup) {
                 popup.style.display = 'none';
-                // DON'T pause music - let it continue playing!
-                
-                // Hide BOTH buttons
                 noBtn.style.display = 'none';
                 yesBtn.style.display = 'none';
-                
-                // Show song name
                 document.getElementById('songDisplay').style.display = 'block';
-                
-                // Continue fireworks on main screen
                 createContinuousFireworks();
-                
-                // Create floating "Yathu loves you infinitely" messages
                 createFloatingMessages();
-                
-                // Change the question with animated kiss emojis
                 document.querySelector('h1').innerHTML = 'Thank You <span class="royal-name">Keerthy</span>, My Love! <span class="kiss-emoji">💋</span><span class="kiss-emoji">😘</span><span class="kiss-emoji">💕</span>';
             }
         });
         
-        // Continuous fireworks for main screen
+        // Continuous fireworks
         let fireworkInterval;
         function createContinuousFireworks() {
-            // Clear any existing interval
             if (fireworkInterval) clearInterval(fireworkInterval);
-            
-            // Create fireworks every second
             fireworkInterval = setInterval(() => {
                 const colors = ['#ff4757', '#ff6b81', '#ffa502', '#ff6348', '#fd79a8', '#fdcb6e'];
                 const x = Math.random() * window.innerWidth;
                 const y = Math.random() * window.innerHeight * 0.6;
-                
                 for (let j = 0; j < 30; j++) {
                     const particle = document.createElement('div');
                     particle.className = 'firework';
                     particle.style.left = x + 'px';
                     particle.style.top = y + 'px';
                     particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    
                     const angle = (Math.PI * 2 * j) / 30;
                     const velocity = 50 + Math.random() * 100;
-                    const xVel = Math.cos(angle) * velocity;
-                    const yVel = Math.sin(angle) * velocity;
-                    
-                    particle.style.setProperty('--x', xVel + 'px');
-                    particle.style.setProperty('--y', yVel + 'px');
+                    particle.style.setProperty('--x', Math.cos(angle) * velocity + 'px');
+                    particle.style.setProperty('--y', Math.sin(angle) * velocity + 'px');
                     particle.style.animation = 'explode 1s ease-out forwards';
-                    
                     document.body.appendChild(particle);
                     setTimeout(() => particle.remove(), 1000);
                 }
             }, 1000);
         }
 
-        // Create floating "Yathu loves you infinitely" messages all over
+        // Floating messages
         function createFloatingMessages() {
             const messages = [
-                "Yathu loves you infinitely 💕",
-                "Yathu loves you infinitely ❤️",
-                "Yathu loves you infinitely 💖",
-                "Yathu loves you infinitely 💗",
-                "Yathu loves you infinitely 💝"
+                "Yathu loves you Unconditionally 💕",
+                "Yathu loves you Unconditionally ❤️",
+                "Yathu loves you Unconditionally 💖",
+                "Yathu loves you Unconditionally 💗",
+                "Yathu loves you Unconditionally 💝"
             ];
-
-            // Create 15 floating messages at random positions
             for (let i = 0; i < 15; i++) {
                 setTimeout(() => {
                     const message = document.createElement('div');
                     message.className = 'floating-message';
                     message.textContent = messages[Math.floor(Math.random() * messages.length)];
-                    
-                    // Random position
                     message.style.left = Math.random() * (window.innerWidth - 300) + 'px';
                     message.style.top = Math.random() * (window.innerHeight - 100) + 'px';
-                    
-                    // Random animation delay and duration
                     message.style.animationDelay = Math.random() * 2 + 's';
                     message.style.animationDuration = (3 + Math.random() * 2) + 's';
-                    
                     document.body.appendChild(message);
                 }, i * 200);
             }
